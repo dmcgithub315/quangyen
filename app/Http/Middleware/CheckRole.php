@@ -8,12 +8,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, ...$roles): Response
-    {
-        if (!$request->user() || !in_array($request->user()->role, $roles)) {
-            abort(403, 'Unauthorized action.');
+    public function handle(Request $request, Closure $next, ...$roles)
+{
+    if (!$request->user() || !in_array($request->user()->role, $roles)) {
+            return redirect('/'); // hoặc route('welcome')
         }
-
         return $next($request);
     }
 } 

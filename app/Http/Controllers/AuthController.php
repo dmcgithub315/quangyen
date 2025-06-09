@@ -14,15 +14,17 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
 
+        if (User::where('phone', $request->phone)->exists()) {
+            return response()->json(['message' => 'Số điện thoại đã tồn tại'], 400);
+        }
+
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
             'address' => $request->address,
@@ -41,17 +43,17 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'phone' => 'required|string|max:20',
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('phone', 'password'))) {
             throw ValidationException::withMessages([
-                'email' => ['Thông tin đăng nhập không chính xác.'],
+                'phone' => ['Thông tin đăng nhập không chính xác.'],
             ]);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('phone', $request->phone)->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -70,5 +72,35 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return response()->json($request->user());
+    }
+
+    public function webLogin(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|max:20',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($request->only('phone', 'password'))) {
+            $request->session()->regenerate();
+            // Kiểm tra role
+            if (Auth::user()->role === 'admin') {
+                return redirect('/dashboard');
+            } else {
+                return redirect('/');
+            }
+        }
+
+        return back()->withErrors([
+            'phone' => 'Thông tin đăng nhập không chính xác.',
+        ]);
+    }
+
+    public function webLogout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login');
     }
 } 
