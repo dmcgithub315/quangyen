@@ -38,7 +38,7 @@ data-sidebar-position="fixed" data-header-position="fixed">
               <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Đăng ký</button>
               <div class="d-flex align-items-center justify-content-center">
                 <p class="fs-4 mb-0 fw-bold">Đã có tài khoản?</p>
-                <a class="text-primary fw-bold ms-2" href="./authentication-login.html">Đăng nhập</a>
+                <a class="text-primary fw-bold ms-2" href="{{route('login')}}">Đăng nhập</a>
               </div>
             </form>
             <div id="registerMessage"></div>
@@ -67,15 +67,17 @@ data-sidebar-position="fixed" data-header-position="fixed">
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'Accept': 'application/json', 
+					'Accept': 'application/json',
 				},
 				body: JSON.stringify(data)
 			});
 			const result = await res.json();
 			if (res.ok) {
-				document.getElementById('registerMessage').innerHTML = '<div class=\"alert alert-success\">Đăng ký thành công!</div>';
-				// Có thể chuyển hướng sang trang đăng nhập
-				// window.location.href = '/login';
+				document.getElementById('registerMessage').innerHTML = '<div class="alert alert-success" role="alert">Đăng ký thành công!</div>';
+				// Chuyển hướng sang trang đăng nhập sau 5 giây
+				setTimeout(() => {
+					window.location.href = '{{route("login")}}';
+				}, 3000);
 			} else {
 				let msg = '';
 				if(result.errors) {

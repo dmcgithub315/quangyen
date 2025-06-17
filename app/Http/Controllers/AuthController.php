@@ -83,17 +83,20 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('phone', 'password'))) {
             $request->session()->regenerate();
-            // Kiểm tra role
-            if (Auth::user()->role === 'admin') {
-                return redirect('/dashboard');
-            } else {
-                return redirect('/');
-            }
+            $user = Auth::user();
+            
+            return response()->json([
+                'message' => 'Đăng nhập thành công',
+                'user' => $user
+            ]);
         }
 
-        return back()->withErrors([
-            'phone' => 'Thông tin đăng nhập không chính xác.',
-        ]);
+        return response()->json([
+            'message' => 'Thông tin đăng nhập không chính xác.',
+            'errors' => [
+                'phone' => ['Thông tin đăng nhập không chính xác.']
+            ]
+        ], 400);
     }
 
     public function webLogout(Request $request)

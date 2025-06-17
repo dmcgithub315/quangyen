@@ -18,7 +18,7 @@
                   <img src="{{ asset('assets/images/logos/dark-logo.svg') }}" width="180" alt="">
                 </a>
                 <p class="text-center">Đăng nhập tài khoản</p>
-                <form method="POST" action="{{ route('login.post') }}">
+                <form id="loginForm" method="POST" action="{{ route('login.post') }}">
                   @csrf
                   <div class="mb-3">
                     <label for="phone" class="form-label">Số điện thoại</label>
@@ -40,7 +40,7 @@
                   <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Đăng nhập</button>
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">Chưa có tài khoản?</p>
-                    <a class="text-primary fw-bold ms-2" href="./register.html">Tạo tài khoản</a>
+                    <a class="text-primary fw-bold ms-2" href="{{ route('register')}}">Tạo tài khoản</a>
                   </div>
                 </form>
                 <div id="loginMessage"></div>
@@ -61,20 +61,21 @@
 			password: form.password.value,
 		};
 		try {
-			const res = await fetch('/api/login', {
+			const res = await fetch('{{ route("login.post") }}', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'Accept': 'application/json',
+					'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 				},
 				body: JSON.stringify(data)
 			});
 			const result = await res.json();
 			if (res.ok) {
-        if (result.user.role === 'admin') {
-            window.location.href = '/dashboard';
+              if (result.user.role === 'admin') {
+              window.location.href = '{{route("dashboard")}}';
         } else {
-            window.location.href = '/';
+            window.location.href = '{{route("home")}}';
         }
     } else {
         let msg = '';

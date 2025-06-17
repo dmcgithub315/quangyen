@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::get('/login', function () {
     return view('pages.login');
@@ -14,6 +14,14 @@ Route::get('/login', function () {
 Route::get('/register', function () {
     return view('pages.register');
 })->name('register');
+
+Route::get('/product', function () {
+    return view('home.product');
+})->name('product');
+
+Route::get('/category', function () {
+    return view('home.category');
+})->name('category');
 
 
 Route::get('/dashboard', function () {
@@ -51,4 +59,4 @@ Route::post('/logout', [AuthController::class, 'webLogout'])->name('logout');
 //     Route::middleware('role:user')->group(function () {
 //         // Thêm các route cho user ở đây
 //     });
-// }); 
+// });
