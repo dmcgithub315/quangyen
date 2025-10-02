@@ -12,29 +12,12 @@ use App\Http\Controllers\ProductInfoController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Image upload routes
-Route::post('/images/upload', [ImageUploadController::class, 'upload']);
-Route::post('/images/ckeditor-upload', [ImageUploadController::class, 'ckeditorUpload']);
-Route::post('/upload-images', [ImageUploadController::class, 'uploadMultiple']);
-Route::delete('/images/delete', [ImageUploadController::class, 'delete']);
-Route::post('/images/optimize', [ImageUploadController::class, 'getOptimizedUrl']);
-
-// Category routes (public access for now)
-Route::get('/categories/addnew', [CategoryController::class, 'addnew']);
-Route::get('/categories/tree', [CategoryController::class, 'tree']);
-Route::apiResource('categories', CategoryController::class);
-Route::patch('/categories/{id}/toggle-status', [CategoryController::class, 'toggleStatus']);
-
-// Product routes (public access for now)
-Route::get('/products/addnew', [ProductController::class, 'addnew']);
-Route::get('/products/by-category/{categoryId}', [ProductController::class, 'byCategory']);
-Route::get('/products/featured', [ProductController::class, 'featured']);
-Route::apiResource('products', ProductController::class);
-
-// Product Info routes (public access for now)
-Route::get('/product-info/by-product/{productId}', [ProductInfoController::class, 'getByProduct']);
-Route::post('/product-info/bulk', [ProductInfoController::class, 'bulkStore']);
-Route::apiResource('product-info', ProductInfoController::class);
+Route::post('/product', [ProductController::class, 'createProduct']);
+Route::get('/product/{id}', [ProductController::class, 'getProductById']);
+Route::put('/product/{id}', [ProductController::class, 'updateProduct']);
+Route::delete('/product/{id}', [ProductController::class, 'deleteProduct']);
+Route::get('/products', [ProductController::class, 'getListProduct']);
+Route::put('/product/{id}/price', [ProductController::class, 'updateProductPrice']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -60,4 +43,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:user')->group(function () {
         // Thêm các route cho user ở đây
     });
-}); 
+});

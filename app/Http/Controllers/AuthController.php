@@ -14,21 +14,17 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20|unique:users,phone',
+            'username' => 'nullable|string|max:50|unique:users,username',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'required|string|max:20',
-            'address' => 'nullable|string|max:255',
         ]);
-
-        if (User::where('phone', $request->phone)->exists()) {
-            return response()->json(['message' => 'Số điện thoại đã tồn tại'], 400);
-        }
 
         $user = User::create([
             'name' => $request->name,
-            'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'address' => $request->address,
-            'role' => 'user', // Mặc định role là user
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'role' => 'user',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -84,7 +80,7 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('phone', 'password'))) {
             $request->session()->regenerate();
             $user = Auth::user();
-            
+
             return response()->json([
                 'message' => 'Đăng nhập thành công',
                 'user' => $user
@@ -106,4 +102,4 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('login');
     }
-} 
+}

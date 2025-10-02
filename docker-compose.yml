@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  app:
+    image: webdevops/php-nginx:8.2
+    container_name: quangyen-app
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:80"
+    environment:
+      WEB_DOCUMENT_ROOT: /app/public
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: quangyen
+      DB_USERNAME: quangyen
+      DB_PASSWORD: password
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    container_name: quangyen-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: quangyen
+      MYSQL_USER: quangyen
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306" # đổi cổng host 3307 để tránh trùng
+    volumes:
+      - db_data:/var/lib/mysql
+    command: ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: quangyen-phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "8081:80" # đổi cổng 8081 để tránh trùng
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+
+
